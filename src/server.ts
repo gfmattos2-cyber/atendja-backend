@@ -630,7 +630,7 @@ app.post('/api/whatsapp/events', async (req: Request, res: Response) => {
         [statusMap, instanceName]
       );
 
-      if (updateRes.rowCount > 0) {
+      if ((updateRes.rowCount ?? 0) > 0) {
         console.log(`[Evolution Webhook] Status da instância '${instanceName}' atualizado para '${statusMap}'.`);
       }
     }
@@ -774,7 +774,7 @@ app.post('/api/internal/usage/log', authenticateInternalToken, async (req: Reque
     `;
     const updateResult = await client.query(updateConfigQuery, [tenantId]);
 
-    if (updateResult.rowCount === 0) {
+    if ((updateResult.rowCount ?? 0) === 0) {
       await client.query('ROLLBACK');
       return res.status(403).json({ error: 'Não foi possível registrar mensagem. Cota mensal excedida.' });
     }
@@ -1023,8 +1023,8 @@ app.post('/v1/tenant/cleanup-pauses', authenticateInternalToken, async (req: Req
       WHERE paused_until <= NOW();
     `;
     const result = await pool.query(query);
-    console.log(`[Cleanup Pauses] ${result.rowCount} pausas expiradas removidas.`);
-    return res.status(200).json({ success: true, count: result.rowCount });
+    console.log(`[Cleanup Pauses] ${result.rowCount ?? 0} pausas expiradas removidas.`);
+    return res.status(200).json({ success: true, count: result.rowCount ?? 0 });
   } catch (error) {
     console.error('Erro no cleanup de pausas:', error);
     return res.status(500).json({ error: 'Erro interno no servidor.' });
