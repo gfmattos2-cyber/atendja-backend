@@ -4,6 +4,11 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import path from 'path';
+import dns from 'dns';
+
+// Forçar Node.js a priorizar conexões IPv4 sobre IPv6.
+// Isso resolve o erro ENETUNREACH em ambientes (como Railway) sem roteamento IPv6 ativo.
+dns.setDefaultResultOrder('ipv4first');
 
 // Carregar variáveis de ambiente
 dotenv.config();
