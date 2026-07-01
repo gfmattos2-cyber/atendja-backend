@@ -13,12 +13,10 @@ const port = process.env.PORT || 3000;
 const jwtSecret = process.env.JWT_SECRET || 'atendja_fallback_secret_key_2026';
 
 // Configurar pool de conexões com o PostgreSQL
-// SSL é necessário para conexões com Supabase em produção (Railway)
+// SSL sempre ativo — banco hospedado no Supabase exige SSL
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' || process.env.DATABASE_URL?.includes('supabase')
-    ? { rejectUnauthorized: false }
-    : false,
+  ssl: { rejectUnauthorized: false },
 });
 
 // Middleware para parsear JSON
