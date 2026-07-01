@@ -19,6 +19,26 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
+// Rota de Health Check para diagnóstico de banco de dados e deploy
+app.get('/health', async (req: Request, res: Response) => {
+  try {
+    const start = Date.now();
+    const dbTest = await pool.query('SELECT NOW()');
+    return res.status(200).json({
+      status: 'healthy',
+      database: 'connected',
+      timestamp: dbTest.rows[0].now,
+      latencyMs: Date.now() - start
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      status: 'unhealthy',
+      database: 'error',
+      message: err.message
+    });
+  }
+});
+
 // Middleware para parsear JSON
 app.use(express.json());
 
@@ -931,9 +951,9 @@ app.get('/v1/tenant/settings', authenticateInternalToken, async (req: Request, r
       grupoAlerta
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro ao buscar settings do tenant:', error);
-    return res.status(500).json({ error: 'Erro interno no banco de dados.' });
+    return res.status(500).json({ error: 'Erro interno no banco de dados.', detail: error.message });
   }
 });
 
